@@ -19,7 +19,8 @@
 </template>
 
 <script>
-import fb from "../firebase/init";
+import firebase from "../firebase/init";
+const { firestore } = firebase;
 
 export default {
   name: "CreateMessage",
@@ -33,7 +34,8 @@ export default {
   methods: {
     createMessage() {
       if (this.newMessage) {
-        fb.collection("messages")
+        firestore
+          .collection("messages")
           .add({
             message: this.newMessage,
             name: this.name,

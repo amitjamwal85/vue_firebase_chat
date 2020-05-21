@@ -1,7 +1,7 @@
 <template>
   <div class="container chat">
-    <h2 class="text-primary text-center">Real-Time Chat</h2>
-    <h5 class="text-secondary text-center">Powered by Vue.js & Firebase</h5>
+    <h3 class="text-primary text-center">Real-Time Chat</h3>
+    <h5 class="text-secondary text-center">Vue.js & Firebase</h5>
     <div class="card">
       <div class="card-body" v-if="isloaded">
         <p class="text-secondary nomessages" v-if="messages.length == 0">
@@ -24,7 +24,8 @@
 
 <script>
 import CreateMessage from "../components/CreateMessage";
-import fb from "../firebase/init";
+import firebase from "../firebase/init";
+const { firestore } = firebase;
 import moment from "moment";
 
 export default {
@@ -35,14 +36,14 @@ export default {
   },
   data() {
     return {
-        isloaded:false,
+      isloaded: false,
       messages: []
     };
   },
   created() {
-    let ref = fb.collection("messages").orderBy("timestamp");
+    let ref = firestore.collection("messages").orderBy("timestamp");
     ref.onSnapshot(snapshot => {
-        this.isloaded = true;
+      this.isloaded = true;
       snapshot.docChanges().forEach(change => {
         console.log("change.type:", change.type);
         if (change.type === "added") {
@@ -56,7 +57,6 @@ export default {
         }
       });
     });
-
   }
 };
 </script>
