@@ -1,8 +1,21 @@
 {
-  "name": "My App Name",
-  "short_name": "My App Short Name",
-  "gcm_sender_id": "802914483090",
+  "name": "vue-chat",
+  "short_name": "vue-chat",
+  "icons": [
+    {
+      "src": "./img/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./img/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",
-  "theme_color": "#210499"
+  "theme_color": "#4DBA87",
+  "gcm_sender_id": "802914483090"
 }

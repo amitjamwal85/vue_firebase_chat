@@ -19,36 +19,63 @@
 </template>
 
 <script>
-import firebase from "../firebase/init";
-const { firestore } = firebase;
+import sessionService from "../common/access.token";
+import apiService from "../common/api.service";
 
 export default {
   name: "CreateMessage",
-  props: ["name"],
+  // props: ["name"],
   data() {
     return {
       newMessage: null,
-      errorText: null
+      errorText: null,
+      name: sessionService.getUser()
     };
   },
   methods: {
     createMessage() {
       if (this.newMessage) {
-        firestore
-          .collection("messages")
-          .add({
-            message: this.newMessage,
-            name: this.name,
-            timestamp: Date.now()
-          })
-          .catch(err => {
-            console.log(err);
+        this.$store
+          .dispatch("ADD_MESSAGE", { name: this.name, msg: this.newMessage })
+          .then(() => {
+            this.sendNotification();
           });
-        this.newMessage = null;
-        this.errorText = null;
       } else {
         this.errorText = "A message must be entered first!";
       }
+    },
+
+    sendNotification() {
+      let api_url = "https://fcm.googleapis.com/fcm/send";
+      console.log("sending notification...");
+      let headers = {
+        headers: {
+          Authorization: "key=" + process.env.VUE_APP_FCM_SERVER_KEY,
+          "Content-Type": "application/json"
+        }
+      };
+
+      let body = {
+        to: "/topics/vue_chat",
+        data: {
+          notification: {
+            body: this.newMessage,
+            title: this.name
+          }
+        }
+      };
+
+      apiService
+        .post(api_url, body, headers)
+        .then(data => {
+          console.log(data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+
+      this.newMessage = null;
+      this.errorText = null;
     }
   }
 };

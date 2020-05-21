@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Login from "../views/Login.vue";
 import Chat from "../views/Chat.vue";
 import Register from "../views/Register.vue";
+import sessionService from "../common/access.token";
 
 Vue.use(VueRouter);
 
@@ -23,7 +24,7 @@ const routes = [
     component: Chat,
     props: true,
     beforeEnter: (to, from, next) => {
-      if (to.params.name) {
+      if (sessionService.getUser()) {
         next();
       } else {
         next({ name: "Login" });

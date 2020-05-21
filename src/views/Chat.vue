@@ -1,22 +1,26 @@
 <template>
   <div class="container chat">
     <h3 class="text-primary text-center">Real-Time Chat</h3>
-    <h5 class="text-secondary text-center">Vue.js & Firebase</h5>
+    <h5 class="text-secondary text-center">Vue.js & Firebase <a href="" @click="logout()">Logout</a></h5>
     <div class="card">
       <div class="card-body" v-if="isloaded">
-        <p class="text-secondary nomessages" v-if="messages.length == 0">
+        <p class="text-secondary nomessages" v-if="get_messages.length === 0">
           [No messages yet!]
         </p>
-        <div class="messages" v-chat-scroll="{ always: false, smooth: true }">
-          <div v-for="message in messages" :key="message.id">
-            <span class="text-info">[{{ message.name }}]: </span>
-            <span>{{ message.message }}</span>
+        <div class="messages" v-chat-scroll="{ always: true, smooth: true }">
+          <div
+            style="text-align: left"
+            v-for="message in get_messages"
+            :key="message.id"
+          >
+            <span class="text-info">[{{ message.name }}]: </span
+            >{{ message.message }}
             <span class="text-secondary time">{{ message.timestamp }}</span>
           </div>
         </div>
       </div>
       <div class="card-action">
-        <CreateMessage :name="name" />
+        <CreateMessage />
       </div>
     </div>
   </div>
@@ -24,39 +28,37 @@
 
 <script>
 import CreateMessage from "../components/CreateMessage";
-import firebase from "../firebase/init";
-const { firestore } = firebase;
-import moment from "moment";
+import { mapGetters } from "vuex";
+import sessionService from "../common/access.token"
 
 export default {
   name: "Chat",
-  props: ["name"],
+  //props: ["name"],
   components: {
     CreateMessage
   },
   data() {
     return {
-      isloaded: false,
-      messages: []
+      isloaded: false
     };
   },
+  methods: {
+
+      logout(){
+            sessionService.destroyUser();
+            this.$router.push({
+                name: "/"
+            });
+      }
+
+  },
   created() {
-    let ref = firestore.collection("messages").orderBy("timestamp");
-    ref.onSnapshot(snapshot => {
+    this.$store.dispatch("GET_MESSAGE").then(() => {
       this.isloaded = true;
-      snapshot.docChanges().forEach(change => {
-        console.log("change.type:", change.type);
-        if (change.type === "added") {
-          let doc = change.doc;
-          this.messages.push({
-            id: doc.id,
-            name: doc.data().name,
-            message: doc.data().message,
-            timestamp: moment(doc.data().timestamp).format("LTS")
-          });
-        }
-      });
     });
+  },
+  computed: {
+    ...mapGetters(["get_messages"])
   }
 };
 </script>

@@ -27,7 +27,7 @@
             <p v-if="errorText" class="text-danger">{{ errorText }}</p>
           </div>
           <button type="submit" class="btn btn-primary">Register</button>
-            <a href=""><router-link to="/">Login</router-link></a>
+          <a href=""><router-link to="/">Login</router-link></a>
         </form>
       </div>
     </div>

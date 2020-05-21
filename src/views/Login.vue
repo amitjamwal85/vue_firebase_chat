@@ -26,7 +26,7 @@
             <p v-if="errorText" class="text-danger">{{ errorText }}</p>
           </div>
           <button type="submit" class="btn btn-primary">Login</button>
-           <a href=""><router-link to="/register">Register</router-link></a>
+          <a href=""><router-link to="/register">Register</router-link></a>
         </form>
       </div>
     </div>
@@ -36,6 +36,7 @@
 <script>
 import firebase from "../firebase/init";
 const { messaging, firestore } = firebase;
+import apiService from "../common/api.service";
 
 export default {
   name: "login",
@@ -48,29 +49,30 @@ export default {
   },
   methods: {
     async login() {
-      var vm = this;
       if (this.username && this.password) {
-        console.log(this.username + "#" + this.password);
-        await firestore
-          .collection("users")
-          .where("username", "==", this.username)
-          .where("password", "==", this.password)
-          .get()
-          .then(function(querySnapshot) {
-            if (querySnapshot.empty) {
-              vm.errorText = "Username/Password incorrect";
-            } else {
-              vm.askforPermission();
-              vm.$router.push({ name: "Chat", params: { name: vm.username } });
-            }
+        this.$store
+          .dispatch("LOGIN", {
+            username: this.username,
+            password: this.password
           })
-          .catch(function(error) {
-            console.log("Error getting documents: ", error);
+          .then(resp => {
+            console.log("resp:", resp);
+            if (resp === "success") {
+              this.askforPermission();
+              this.$router.push({
+                name: "Chat" /*, params: { name: this.username }*/
+              });
+            } else if (resp === "failed") {
+              this.errorText = "Username/Password incorrect";
+            } else {
+              this.errorText = "System error, Please try again later.";
+            }
           });
       } else {
         this.errorText = "Please username and password";
       }
     },
+
     async saveToken(usertoken) {
       await firestore
         .collection("fcm")
@@ -82,8 +84,9 @@ export default {
           console.log(err);
         });
     },
+
     async getUserToken(token) {
-      var vm = this;
+      let vm = this;
       await firestore
         .collection("fcm")
         .where("username", "==", vm.username)
@@ -103,6 +106,28 @@ export default {
           console.log("Error getting documents: ", error);
         });
     },
+
+    async subscribeTopic(token) {
+      let topic = "vue_chat";
+      let api_url =
+        "https://iid.googleapis.com/iid/v1/" + token + "/rel/topics/" + topic;
+      console.log("subscribing to topic : " + topic);
+      let headers = {
+        headers: {
+          Authorization: "key=" + process.env.VUE_APP_FCM_SERVER_KEY,
+          "Content-Type": "application/json"
+        }
+      };
+      await apiService
+        .post(api_url, {}, headers)
+        .then(data => {
+          console.log(data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+
     async askforPermission() {
       await messaging
         .requestPermission()
@@ -111,28 +136,16 @@ export default {
           messaging.getToken().then(async token => {
             console.log("New token created update: ", token);
             this.getUserToken(token);
+            this.subscribeTopic(token);
           });
         })
         .catch(err => {
           console.log("Unable to get permission to notify.", err.code);
         });
-
-      // messaging.onTokenRefresh(function() {
-      //   messaging
-      //     .getToken()
-      //     .then(function(newToken) {
-      //       console.log("Token refreshed: ", newToken);
-      //     })
-      //     .catch(function(err) {
-      //       console.log("Unable to retrieve refreshed token ", err);
-      //     });
-      // });
     }
   },
 
-  mounted() {
-    // messaging.usePublicVapidKey("BKMKv7z0t2oGgvEagK_65KPixUaAMC8igPa8VWk_OF0xmYg_QOgBqLwJTlWQvfKTClPm_xnXyXaZZI1kglGW_js");
-  }
+  mounted() {}
 };
 </script>
 
