@@ -67,6 +67,7 @@ const actions = {
       });
       context.commit("SET_MESSAGE", messsages);
     });
+    return "success";
   }
 };
 

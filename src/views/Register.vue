@@ -48,6 +48,14 @@ export default {
       isactive: false
     };
   },
+  watch: {
+      $route: {
+          immediate: true,
+          handler(to) {
+              document.title = to.meta.title || 'Register';
+          }
+      },
+  },
   methods: {
     async checkStatus() {
       var vm = this;

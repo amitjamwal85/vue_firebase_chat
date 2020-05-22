@@ -2,8 +2,8 @@
   <div class="container chat">
     <h3 class="text-primary text-center">Real-Time Chat</h3>
     <h5 class="text-secondary text-center">Vue.js & Firebase <a href="" @click="logout()">Logout</a></h5>
-    <div class="card">
-      <div class="card-body" v-if="isloaded">
+    <div class="card" v-if="isloaded">
+      <div class="card-body" >
         <p class="text-secondary nomessages" v-if="get_messages.length === 0">
           [No messages yet!]
         </p>
@@ -34,6 +34,14 @@ import sessionService from "../common/access.token"
 export default {
   name: "Chat",
   //props: ["name"],
+  watch: {
+      $route: {
+          immediate: true,
+          handler(to) {
+              document.title = to.meta.title || 'Chat';
+          }
+      },
+  },
   components: {
     CreateMessage
   },

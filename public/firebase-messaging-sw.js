@@ -13,11 +13,11 @@ const messaging = firebase.messaging();
 messaging.setBackgroundMessageHandler(function(payload) {
     console.log('Received background message ', payload);
     let data = JSON.parse(payload.data.notification);
-    // messages.push(data);
     const notificationTitle = data.title;
+    console.log(data.icon);
     const notificationOptions = {
       body: data.body,
-      icon: 'img/icons/favicon-32x32.png'
+      icon: data.icon
     };
 
     return self.registration.showNotification(notificationTitle,

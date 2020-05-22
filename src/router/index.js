@@ -39,4 +39,12 @@ const router = new VueRouter({
   routes
 });
 
+// const DEFAULT_TITLE = 'Login';
+// router.afterEach((to, from) => {
+//     console.log(from)
+//     Vue.nextTick(() => {
+//         document.title = to.meta.title || DEFAULT_TITLE;
+//     });
+// });
+
 export default router;

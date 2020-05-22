@@ -40,6 +40,14 @@ import apiService from "../common/api.service";
 
 export default {
   name: "login",
+  watch: {
+      $route: {
+          immediate: true,
+          handler(to) {
+              document.title = to.meta.title || 'Login';
+          }
+      },
+  },
   data() {
     return {
       username: "",

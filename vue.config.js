@@ -11,6 +11,10 @@ module.exports = {
     workboxPluginMode: "InjectManifest",
     workboxOptions: {
       swSrc: "public/firebase-messaging-sw.js"
+    },
+    iconPaths: {
+       favicon32: 'favicon.png',
+       favicon16: 'favicon.png',
     }
   }
 };
